@@ -1,6 +1,6 @@
 pipeline {
     agent {
-      label "jenkins-maven"
+      label "jenkins-maven && jenkins-nodejs"
     }
     environment {
       ORG               = 'mraible'
@@ -28,11 +28,15 @@ pipeline {
               sh "mvn verify"
               sh "mvn clean package -Pprod -DskipTests"
               sh "java -jar target/*.jar &"
-              container('nodejs') {
-                sh "mvn com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run e2e' -DworkingDirectory=../crypto-pwa"
-              }
-            }
+          }
 
+          container('nodejs') {
+            dir ('./crypto-pwa') {
+              sh "npm run e2e"
+            }
+          }
+
+          container('maven') {
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
           }
