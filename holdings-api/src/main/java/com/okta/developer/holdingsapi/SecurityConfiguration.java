@@ -26,7 +26,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             .and()
                 .authorizeRequests()
-                .antMatchers("/", "/home", "/api/user").permitAll()
+                .antMatchers("/", "/home", "/api/user", "/actuator/health").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .requiresChannel()
