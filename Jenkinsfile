@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-      label "jenkins-maven && jenkins-nodejs"
-    }
+    agent none
     environment {
       ORG               = 'mraible'
       APP_NAME          = 'jx-demo'
@@ -12,7 +10,10 @@ pipeline {
       CI                = true
     }
     stages {
-      stage('CI Build and push snapshot') {
+      stage('CI Build and run') {
+        agent {
+          label "jenkins-maven"
+        }
         when {
           branch 'PR-*'
         }
@@ -29,13 +30,41 @@ pipeline {
               sh "mvn clean package -Pprod -DskipTests"
               sh "java -jar target/*.jar &"
           }
-
+        }
+      }
+      stage('CI e2e') {
+        agent {
+          label "jenkins-nodejs"
+        }
+        when {
+          branch 'PR-*'
+        }
+        environment {
+          PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
+          PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
+          HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
+        }
+        steps {
           container('nodejs') {
             dir ('./crypto-pwa') {
               sh "npm run e2e"
             }
           }
-
+        }
+      }
+      stage('Deploy Preview') {
+        agent {
+          label "jenkins-maven"
+        }
+        when {
+          branch 'PR-*'
+        }
+        environment {
+          PREVIEW_VERSION = "0.0.0-SNAPSHOT-$BRANCH_NAME-$BUILD_NUMBER"
+          PREVIEW_NAMESPACE = "$APP_NAME-$BRANCH_NAME".toLowerCase()
+          HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
+        }
+        steps {
           container('maven') {
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
@@ -50,6 +79,9 @@ pipeline {
         }
       }
       stage('Build Release') {
+        agent {
+          label "jenkins-maven"
+        }
         when {
           branch 'master'
         }
@@ -82,6 +114,7 @@ pipeline {
         }
       }
       stage('Promote to Environments') {
+        agent any
         when {
           branch 'master'
         }
