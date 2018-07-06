@@ -9,6 +9,7 @@ pipeline {
       OKTA_CLIENT_TOKEN = credentials('OKTA_CLIENT_TOKEN')
       E2E_USERNAME      = credentials('E2E_USERNAME')
       E2E_PASSWORD      = credentials('E2E_PASSWORD')
+      CI                = true
     }
     stages {
       stage('CI Build and push snapshot') {
@@ -24,7 +25,10 @@ pipeline {
           container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              sh "mvn install -Pprod"
+              sh "mvn verify"
+              sh "mvn clean package -Pprod -DskipTests"
+              sh "java -jar target/*.jar &"
+              sh "mvn com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run e2e' -DworkingDirectory=../crypto-pwa"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
