@@ -28,9 +28,9 @@ pipeline {
               sh "mvn verify"
               sh "mvn clean package -Pprod -DskipTests"
               sh "java -jar target/*.jar &"
-              // try to solve 'npm: command not found'
-              sh "mvn com.github.eirslett:frontend-maven-plugin:install-node-and-npm -DnodeVersion=v8.10.0"
-              sh "mvn com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run e2e' -DworkingDirectory=../crypto-pwa"
+              container('nodejs') {
+                sh "mvn com.github.eirslett:frontend-maven-plugin:npm -Dfrontend.npm.arguments='run e2e' -DworkingDirectory=../crypto-pwa"
+              }
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
