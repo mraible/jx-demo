@@ -1,6 +1,7 @@
 pipeline {
     agent {
-      label "jenkins-maven && jenkins-nodejs"
+      label "jenkins-maven"
+      label "jenkins-nodejs"
     }
     environment {
       ORG               = 'mraible'
