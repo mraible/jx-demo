@@ -4,7 +4,7 @@ pipeline {
     }
     environment {
       ORG               = 'mraible'
-      APP_NAME          = 'okta-jenkinsx-demo'
+      APP_NAME          = 'jx-demo'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
     }
     stages {
@@ -53,7 +53,7 @@ pipeline {
               sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
             }
           }
-          dir ('./charts/okta-jenkinsx-demo') {
+          dir ('./charts/jx-demo') {
             container('maven') {
               sh "make tag"
             }
@@ -73,7 +73,7 @@ pipeline {
           branch 'master'
         }
         steps {
-          dir ('./charts/okta-jenkinsx-demo') {
+          dir ('./charts/jx-demo') {
             container('maven') {
               sh 'jx step changelog --version v\$(cat ../../VERSION)'
 
