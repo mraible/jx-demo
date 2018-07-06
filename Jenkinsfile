@@ -6,6 +6,9 @@ pipeline {
       ORG               = 'mraible'
       APP_NAME          = 'jx-demo'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+      OKTA_CLIENT_TOKEN = credentials('OKTA_CLIENT_TOKEN')
+      E2E_USERNAME      = credentials('E2E_USERNAME')
+      E2E_PASSWORD      = credentials('E2E_PASSWORD')
     }
     stages {
       stage('CI Build and push snapshot') {
