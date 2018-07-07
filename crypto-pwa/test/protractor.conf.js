@@ -9,7 +9,7 @@ exports.config = {
     'browserName': 'chrome'
   },
   directConnect: true,
-  baseUrl: (process.env.CI) ? 'http://localhost:8200' : 'http://localhost:8100',
+  baseUrl: (process.env.CI) ? 'http://localhost:' + process.env.PORT : 'http://localhost:8100',
   framework: 'jasmine',
   jasmineNodeOpts: {
     showColors: true,

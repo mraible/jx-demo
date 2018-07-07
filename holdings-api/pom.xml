@@ -292,6 +292,24 @@
             <build>
                 <plugins>
                     <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>reserve-tomcat-port</id>
+                                <goals>
+                                    <goal>reserve-network-port</goal>
+                                </goals>
+                                <phase>process-resources</phase>
+                                <configuration>
+                                    <portNames>
+                                        <portName>http.port</portName>
+                                    </portNames>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
                         <groupId>org.springframework.boot</groupId>
                         <artifactId>spring-boot-maven-plugin</artifactId>
                         <executions>
@@ -302,8 +320,9 @@
                                 </goals>
                                 <configuration>
                                     <arguments>
-                                        <argument>--server.port=8200</argument>
+                                        <argument>--server.port=${http.port}</argument>
                                     </arguments>
+                                    <wait>450000</wait>
                                 </configuration>
                             </execution>
                             <execution>
@@ -329,6 +348,9 @@
                                 </goals>
                                 <phase>integration-test</phase>
                                 <configuration>
+                                    <environmentVariables>
+                                        <PORT>${http.port}</PORT>
+                                    </environmentVariables>
                                     <arguments>run e2e</arguments>
                                 </configuration>
                             </execution>
