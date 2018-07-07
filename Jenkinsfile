@@ -54,7 +54,7 @@ pipeline {
             // so we can retrieve the version in later steps
             sh "echo \$(jx-release-version) > VERSION"
             dir ('./holdings-api') {
-              sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
+              sh "mvn versions:set -DnewVersion=\$(cat ../VERSION)"
             }
           }
           dir ('./charts/jx-demo') {
