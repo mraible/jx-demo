@@ -15,8 +15,7 @@
     "test:watch": "jest --watch",
     "test:ci": "jest --runInBand",
     "test:coverage": "jest --coverage",
-    "e2e": "protractor ./test/protractor.conf.js",
-    "postinstall": "webdriver-manager update --standalone false --gecko false"
+    "e2e": "webdriver-manager update --standalone false --gecko false && protractor ./test/protractor.conf.js"
   },
   "dependencies": {
     "@angular/common": "5.2.10",
