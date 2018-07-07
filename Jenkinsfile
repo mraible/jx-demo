@@ -6,6 +6,10 @@ pipeline {
       ORG               = 'mraible'
       APP_NAME          = 'jx-demo'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
+      OKTA_CLIENT_TOKEN = credentials('OKTA_CLIENT_TOKEN')
+      E2E_USERNAME      = credentials('E2E_USERNAME')
+      E2E_PASSWORD      = credentials('E2E_PASSWORD')
+      CI                = true
     }
     stages {
       stage('CI Build and push snapshot') {
@@ -19,19 +23,20 @@ pipeline {
         }
         steps {
           container('maven') {
-            sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-            sh "mvn install"
+            dir ('./holdings-api') {
+              sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
+              sh "mvn install -Pprod"
+            }
+
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
-
-
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:$PREVIEW_VERSION"
           }
 
           dir ('./charts/preview') {
-           container('maven') {
-             sh "make preview"
-             sh "jx preview --app $APP_NAME --dir ../.."
-           }
+            container('maven') {
+              sh "make preview"
+              sh "jx preview --app $APP_NAME --dir ../.."
+            }
           }
         }
       }
@@ -48,7 +53,9 @@ pipeline {
             sh "jx step git credentials"
             // so we can retrieve the version in later steps
             sh "echo \$(jx-release-version) > VERSION"
-            sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
+            dir ('./holdings-api') {
+              sh "mvn versions:set -DnewVersion=\$(cat VERSION)"
+            }
           }
           dir ('./charts/jx-demo') {
             container('maven') {
@@ -56,11 +63,11 @@ pipeline {
             }
           }
           container('maven') {
-            sh 'mvn clean deploy'
+            dir ('./holdings-api') {
+              sh 'mvn clean deploy -Pprod'
+            }
 
             sh 'export VERSION=`cat VERSION` && skaffold build -f skaffold.yaml'
-
-
             sh "jx step post build --image $DOCKER_REGISTRY/$ORG/$APP_NAME:\$(cat VERSION)"
           }
         }
