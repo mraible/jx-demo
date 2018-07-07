@@ -25,9 +25,7 @@ pipeline {
           container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              wrap([$class: 'Xvfb']) {
-                sh "mvn install -Pprod,e2e"
-              }
+              sh "mvn install -Pprod"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
