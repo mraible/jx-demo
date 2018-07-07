@@ -326,15 +326,6 @@
                         </configuration>
                         <executions>
                             <execution>
-                                <id>install node and npm</id>
-                                <goals>
-                                    <goal>install-node-and-npm</goal>
-                                </goals>
-                                <configuration>
-                                    <nodeVersion>${node.version}</nodeVersion>
-                                </configuration>
-                            </execution>
-                            <execution>
                                 <id>ionic e2e</id>
                                 <goals>
                                     <goal>npm</goal>
