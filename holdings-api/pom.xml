@@ -287,5 +287,50 @@
                 <spring.profiles.active>prod</spring.profiles.active>
             </properties>
         </profile>
+        <profile>
+            <id>e2e</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>pre-integration-test</id>
+                                <goals>
+                                    <goal>start</goal>
+                                </goals>
+                            </execution>
+                            <execution>
+                                <id>post-integration-test</id>
+                                <goals>
+                                    <goal>stop</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>com.github.eirslett</groupId>
+                        <artifactId>frontend-maven-plugin</artifactId>
+                        <version>${frontend-maven-plugin.version}</version>
+                        <configuration>
+                            <workingDirectory>../crypto-pwa</workingDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>ionic e2e</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>integration-test</phase>
+                                <configuration>
+                                    <arguments>run e2e</arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 </project>
