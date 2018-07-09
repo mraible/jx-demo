@@ -1,6 +1,6 @@
 pipeline {
     agent {
-      label "jenkins-maven"
+      label "maven-chrome"
     }
     environment {
       ORG               = 'mraible'
