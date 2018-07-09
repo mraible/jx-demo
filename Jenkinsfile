@@ -7,12 +7,16 @@ pipeline {
       APP_NAME          = 'jx-demo'
       CHARTMUSEUM_CREDS = credentials('jenkins-x-chartmuseum')
       OKTA_CLIENT_TOKEN = credentials('OKTA_CLIENT_TOKEN')
+      OKTA_APP_ID       = credentials('OKTA_APP_ID')
       E2E_USERNAME      = credentials('E2E_USERNAME')
       E2E_PASSWORD      = credentials('E2E_PASSWORD')
       CI                = true
     }
     stages {
       stage('CI Build and push snapshot') {
+        agent {
+          label "jenkins-nodejs"
+        }
         when {
           branch 'PR-*'
         }
@@ -36,6 +40,29 @@ pipeline {
             container('maven') {
               sh "make preview"
               sh "jx preview --app $APP_NAME --dir ../.."
+            }
+          }
+
+          // Add redirect URI in Okta
+          dir ('./holdings-api') {
+            container('maven') {
+              sh '''
+              yum install -y jq
+              previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")'''
+              sh "mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=$previewUrl"
+            }
+          }
+        }
+      }
+      stage('Run e2e tests') {
+        agent {
+          label "jenkins-nodejs"
+        }
+        steps {
+          container('nodejs') {
+            dir ('./holdings-api') {
+              sh "chmod +x ./mvnw"
+              sh "./mvnw verify -Pprod,e2e"
             }
           }
         }
