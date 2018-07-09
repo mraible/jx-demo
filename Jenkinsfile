@@ -23,10 +23,26 @@ pipeline {
         }
         steps {
           container('maven') {
-          sh """sudo sh -c ‘echo "deb [arch=amd64] http://dl-ssl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list’
-            wget -q -O —  https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-            sudo apt-get update
-            sudo apt-get install google-chrome-stable -y"""
+          sh """echo "##### Add Google Chrome's repo to sources..."
+                echo "deb http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee -a /etc/apt/sources.list
+                # Install Google's public key used for signing packages (e.g. Chrome)
+                wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+                # Update apt sources
+                sudo apt-get update
+
+                echo "##### Installing Headless Chrome dependencies..."
+                sudo apt-get install -y libxpm4 libxrender1 libgtk2.0-0 libnss3 libgconf-2-4
+                sudo apt-get install -y google-chrome-stable
+                sudo apt-get install -y xvfb gtk2-engines-pixbuf
+                sudo apt-get install -y xfonts-cyrillic xfonts-100dpi xfonts-75dpi xfonts-base xfonts-scalable
+                sudo apt-get install -y imagemagick x11-apps
+
+                ## Since https://wiki.jenkins-ci.org/display/JENKINS/ChromeDriver+plugin doesn't work...
+                echo "##### Downloading latest ChromeDriver..."
+                LATEST=$(wget -q -O - http://chromedriver.storage.googleapis.com/LATEST_RELEASE)
+                sudo wget http://chromedriver.storage.googleapis.com/$LATEST/chromedriver_linux64.zip
+                echo "##### Extracting and symlinking chromedriver to PATH so it's available globally"
+                sudo unzip chromedriver_linux64.zip && sudo ln -s $PWD/chromedriver /usr/local/bin/chromedriver"""
 
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
