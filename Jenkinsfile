@@ -45,8 +45,8 @@ pipeline {
             container('maven') {
               sh '''
               yum install -y jq
-              export PREVIEW_URL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${PREVIEW_URL}/login
+              previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
+              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewUrl}/login
               '''
             }
           }
