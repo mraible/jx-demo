@@ -14,9 +14,6 @@ pipeline {
     }
     stages {
       stage('CI Build and push snapshot') {
-        agent {
-          label "jenkins-nodejs"
-        }
         when {
           branch 'PR-*'
         }
@@ -50,6 +47,19 @@ pipeline {
               yum install -y jq
               previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")'''
               sh "mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=$previewUrl"
+            }
+          }
+        }
+      }
+      stage('Run e2e tests') {
+        agent {
+          label "jenkins-nodejs"
+        }
+        steps {
+          container('nodejs') {
+            dir ('./holdings-api') {
+              sh "chmod +x ./mvnw"
+              sh "./mvnw verify -Pprod,e2e"
             }
           }
         }
