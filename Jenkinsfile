@@ -1,8 +1,8 @@
+pipeline {
 podTemplate(label: 'maven-selenium', containers: [
   containerTemplate(name: 'maven-chrome', image: 'maven:3.3.9-jdk-8-alpine', ttyEnabled: true, command: 'cat')
 ]) {
   node('maven-selenium') {
-pipeline {
     agent {
       label "jenkins-maven"
     }
