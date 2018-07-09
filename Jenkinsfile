@@ -61,6 +61,7 @@ pipeline {
             dir ('./holdings-api') {
               sh "chmod +x ./mvnw"
               sh "./mvnw spring-boot:run --server.port=8000 -Pprod &"
+              sh "sleep 30s"
             }
             dir ('./crypto-pwa') {
               sh "npm install"
