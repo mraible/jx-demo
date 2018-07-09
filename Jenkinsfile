@@ -25,7 +25,7 @@ pipeline {
           container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              sh "sh -e /etc/init.d/xvfb start"
+              sh "Xvfb :99 &"
               sh "DISPLAY=:99 mvn install -Pprod,e2e"
             }
 
