@@ -54,19 +54,6 @@ pipeline {
           }
         }
       }
-      stage('Run e2e tests') {
-        agent {
-          label "jenkins-nodejs"
-        }
-        steps {
-          container('nodejs') {
-            dir ('./holdings-api') {
-              sh "chmod +x ./mvnw"
-              sh "./mvnw verify -Pprod,e2e"
-            }
-          }
-        }
-      }
       stage('Build Release') {
         when {
           branch 'master'
