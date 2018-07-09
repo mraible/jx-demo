@@ -14,26 +14,6 @@ pipeline {
     }
     stages {
       stage('CI Build and push snapshot') {
-        agent {
-          kubernetes {
-            label 'protractor'
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  labels:
-    some-label: some-label-value
-spec:
-  serviceAccountName: jenkins
-  containers:
-  - name: maven-chrome
-    image: jenkinsxio/builder-maven:0.0.305
-    command:
-    - cat
-    tty: true
-"""
-          }
-        }
         when {
           branch 'PR-*'
         }
@@ -43,11 +23,10 @@ spec:
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
         }
         steps {
-          container('maven-chrome') {
+          container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              sh "Xvfb :99 &"
-              sh "DISPLAY=:99 mvn install -Pprod,e2e"
+              sh "mvn install -Pprod"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
