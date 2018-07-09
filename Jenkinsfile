@@ -59,6 +59,7 @@ pipeline {
           container('nodejs') {
             dir ('./holdings-api') {
               sh "chmod +x ./mvnw"
+              sh "java -version"
               sh "./mvnw verify -Pprod,e2e"
             }
           }
