@@ -1,8 +1,4 @@
 pipeline {
-podTemplate(label: 'maven-selenium', containers: [
-  containerTemplate(name: 'maven-chrome', image: 'maven:3.3.9-jdk-8-alpine', ttyEnabled: true, command: 'cat')
-]) {
-  node('maven-selenium') {
     agent {
       label "jenkins-maven"
     }
@@ -40,6 +36,8 @@ podTemplate(label: 'maven-selenium', containers: [
           dir ('./charts/preview') {
             container('maven') {
               sh "make preview"
+              sh "echo $APPLICATION_URL"
+              sh "echo $APP_URL"
               sh "jx preview --app $APP_NAME --dir ../.."
             }
           }
@@ -108,4 +106,3 @@ Select Proceed or Abort to terminate the build pod"""
         }
     }
   }
-}}
