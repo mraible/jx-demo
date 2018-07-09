@@ -46,7 +46,9 @@ pipeline {
               sh '''
               yum install -y jq
               previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewUrl}/login
+              // so we can retrieve the preview URL in later steps
+              sh "echo \$(previewUrl) > ../PREVIEW_URL"
+              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=\$(cat ../PREVIEW_URL)/login
               '''
             }
           }
@@ -58,11 +60,11 @@ pipeline {
         }
         steps {
           container('nodejs') {
-            sh "echo 'Running e2e tests on ${PREVIEW_URL}...'"
+            sh "echo 'Running e2e tests on \$(cat PREVIEW_URL)...'"
             dir ('./crypto-pwa') {
               sh "npm install"
               sh "Xvfb :99 &"
-              sh "DISPLAY=:99 npm run e2e -- --baseUrl=$PREVIEW_URL"
+              sh "DISPLAY=:99 npm run e2e -- --baseUrl=\$(cat PREVIEW_URL)"
             }
           }
         }
