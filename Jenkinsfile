@@ -25,8 +25,7 @@ pipeline {
           container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              sh "Xvfb :99 &"
-              sh "DISPLAY=:99 mvn install -Pprod -DskipTests"
+              sh "mvn install -Pprod"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
@@ -36,7 +35,6 @@ pipeline {
           dir ('./charts/preview') {
             container('maven') {
               sh "make preview"
-              sh "echo $APP_URL"
               sh "jx preview --app $APP_NAME --dir ../.."
             }
           }
