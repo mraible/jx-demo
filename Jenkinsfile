@@ -10,8 +10,6 @@ pipeline {
       E2E_USERNAME      = credentials('E2E_USERNAME')
       E2E_PASSWORD      = credentials('E2E_PASSWORD')
       CI                = true
-      CHROME_BIN        = /usr/bin/google-chrome
-      DISPLAY           = ':99.0'
     }
     stages {
       stage('CI Build and push snapshot') {
@@ -28,7 +26,7 @@ pipeline {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
               sh "sh -e /etc/init.d/xvfb start"
-              sh "mvn install -Pprod,e2e"
+              sh "DISPLAY=:99 mvn install -Pprod,e2e"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
