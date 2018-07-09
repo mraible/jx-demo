@@ -11,7 +11,7 @@ pipeline {
       E2E_PASSWORD      = credentials('E2E_PASSWORD')
       CI                = true
       CHROME_BIN        = /usr/bin/google-chrome
-      DISPLAY           = :99.0
+      DISPLAY           = ':99.0'
     }
     stages {
       stage('CI Build and push snapshot') {
