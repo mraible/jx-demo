@@ -36,7 +36,6 @@ pipeline {
           dir ('./charts/preview') {
             container('maven') {
               sh "make preview"
-              sh "echo $APPLICATION_URL"
               sh "echo $APP_URL"
               sh "jx preview --app $APP_NAME --dir ../.."
             }
