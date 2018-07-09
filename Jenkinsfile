@@ -65,7 +65,7 @@ pipeline {
             dir ('./crypto-pwa') {
               sh "npm install"
               sh "Xvfb :99 &"
-              sh "DISPLAY=:99 npm run e2e"
+              sh "DISPLAY=:99 PORT=8000 npm run e2e"
             }
           }
         }
