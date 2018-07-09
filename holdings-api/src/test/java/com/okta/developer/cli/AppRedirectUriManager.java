@@ -1,6 +1,7 @@
 package com.okta.developer.cli;
 
 import com.okta.sdk.client.Client;
+import com.okta.sdk.resource.PropertyRetriever;
 import com.okta.sdk.resource.application.OpenIdConnectApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +43,19 @@ public class AppRedirectUriManager implements ApplicationRunner {
 
         // update login redirect URIs
         List<String> redirectUris = app.getSettings().getOAuthClient().getRedirectUris();
+        redirectUris = updateURIs(redirectUris);
+        app.getSettings().getOAuthClient().setRedirectUris(redirectUris);
 
+        // update logout redirect URI
+        List<String> logoutUris = ((PropertyRetriever) app.getSettings().getOAuthClient())
+                .getStringList("post_logout_redirect_uris");
+        logoutUris = updateURIs(logoutUris);
+        // todo: update app's logout URIs
+        app.update();
+        System.exit(0);
+    }
+
+    private List<String> updateURIs(List<String> redirectUris) {
         if (operation.equalsIgnoreCase("add")) {
             if (!redirectUris.contains(redirectUri)) {
                 redirectUris.add(redirectUri);
@@ -50,12 +63,6 @@ public class AppRedirectUriManager implements ApplicationRunner {
         } else if (operation.equalsIgnoreCase("remove")) {
             redirectUris.remove(redirectUri);
         }
-
-        app.getSettings().getOAuthClient().setRedirectUris(redirectUris);
-
-        // todo: update logout redirect URIs
-
-        app.update();
-        System.exit(0);
+        return redirectUris;
     }
 }
