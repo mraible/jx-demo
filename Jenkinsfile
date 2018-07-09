@@ -63,6 +63,7 @@ pipeline {
               sh "./mvnw spring-boot:run --server.port=8000 -Pprod &"
             }
             dir ('./crypto-pwa') {
+              sh "npm install"
               sh "Xvfb :99 &"
               sh "DISPLAY=:99 npm run e2e"
             }
