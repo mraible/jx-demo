@@ -39,6 +39,8 @@ public class AppRedirectUriManager implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         log.info("Adjusting Okta settings: {appId: {}, redirectUri: {}, operation: {}}", appId, redirectUri, operation);
         OpenIdConnectApplication app = (OpenIdConnectApplication) client.getApplication(appId);
+
+        // update login redirect URIs
         List<String> redirectUris = app.getSettings().getOAuthClient().getRedirectUris();
 
         if (operation.equalsIgnoreCase("add")) {
@@ -50,6 +52,9 @@ public class AppRedirectUriManager implements ApplicationRunner {
         }
 
         app.getSettings().getOAuthClient().setRedirectUris(redirectUris);
+
+        // todo: update logout redirect URIs
+
         app.update();
         System.exit(0);
     }
