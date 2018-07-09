@@ -1,6 +1,6 @@
 pipeline {
     agent {
-      label "maven-chrome"
+      label "jenkins-maven"
     }
     environment {
       ORG               = 'mraible'
@@ -22,7 +22,7 @@ pipeline {
           HELM_RELEASE = "$PREVIEW_NAMESPACE".toLowerCase()
         }
         steps {
-          container('maven') {
+          container('maven-chrome') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
               sh "Xvfb :99 &"
