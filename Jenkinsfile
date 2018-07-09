@@ -26,7 +26,7 @@ pipeline {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
               sh "Xvfb :99 &"
-              sh "DISPLAY=:99 mvn install -Pprod"
+              sh "DISPLAY=:99 mvn install -Pprod -DskipTests"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
