@@ -32,6 +32,8 @@ spec:
     - cat
     tty: true
 """
+          }
+        }
         when {
           branch 'PR-*'
         }
