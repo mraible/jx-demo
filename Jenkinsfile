@@ -61,9 +61,9 @@ pipeline {
             sh '''
               yum install -y jq
               previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              cd crypto-pwa && npm install
+              cd crypto-pwa && npm install --unsafe-perm
               Xvfb :99 &
-              echo 'Running e2e tests on ${previewURL}...
+              echo 'Running e2e tests on ${previewURL}...'
               DISPLAY=:99 npm run e2e -- --baseUrl=${previewURL}
             '''
           }
