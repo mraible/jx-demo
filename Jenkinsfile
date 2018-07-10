@@ -46,7 +46,7 @@ pipeline {
               sh '''
               yum install -y jq
               previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              echo $previewUrl > ../PREVIEW_URL
+              echo previewUrl > ../PREVIEW_URL
               mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewUrl}/login
               '''
             }
