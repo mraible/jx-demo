@@ -45,9 +45,9 @@ pipeline {
             container('maven') {
               sh '''
               yum install -y jq
-              previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              echo previewUrl > ../PREVIEW_URL
-              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewUrl}/login
+              previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
+              echo $previewURL > ../PREVIEW_URL
+              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewURL}/login
               '''
             }
           }
@@ -59,12 +59,12 @@ pipeline {
         }
         steps {
           container('nodejs') {
-            sh "previewUrl=\$(cat PREVIEW_URL)"
-            sh "echo 'Running e2e tests on ${previewUrl}...'"
+            sh "previewURL=\$(cat PREVIEW_URL)"
+            sh "echo 'Running e2e tests on ${previewURL}...'"
             dir ('./crypto-pwa') {
               sh "npm install"
               sh "Xvfb :99 &"
-              sh "DISPLAY=:99 npm run e2e -- --baseUrl=${previewUrl}"
+              sh "DISPLAY=:99 npm run e2e -- --baseUrl=${previewURL}"
             }
           }
         }
