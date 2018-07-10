@@ -1,6 +1,7 @@
 package com.okta.developer.cli;
 
 import com.okta.sdk.client.Client;
+import com.okta.sdk.lang.Collections;
 import com.okta.sdk.resource.application.OpenIdConnectApplication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +11,9 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @SpringBootApplication
 public class AppRedirectUriManager implements ApplicationRunner {
@@ -44,16 +47,16 @@ public class AppRedirectUriManager implements ApplicationRunner {
 
         // update redirect URIs
         List<String> redirectUris = app.getSettings().getOAuthClient().getRedirectUris();
+        // use a set so values are unique
+        Set<String> updatedRedirectUris = new LinkedHashSet<>(redirectUris);
         if (operation.equalsIgnoreCase("add")) {
-            if (!redirectUris.contains(redirectUri)) {
-                redirectUris.add(redirectUri);
-                redirectUris.add(loginRedirectUri);
-            }
+            updatedRedirectUris.add(redirectUri);
+            updatedRedirectUris.add(loginRedirectUri);
         } else if (operation.equalsIgnoreCase("remove")) {
-            redirectUris.remove(redirectUri);
-            redirectUris.remove(loginRedirectUri);
+            updatedRedirectUris.remove(redirectUri);
+            updatedRedirectUris.remove(loginRedirectUri);
         }
-        app.getSettings().getOAuthClient().setRedirectUris(redirectUris);
+        app.getSettings().getOAuthClient().setRedirectUris(Collections.toList(updatedRedirectUris));
         app.update();
         System.exit(0);
     }
