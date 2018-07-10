@@ -26,7 +26,7 @@ pipeline {
           container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              sh "mvn install -Pprod"
+              sh "mvn install -Pprod -DskipTests"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
@@ -44,9 +44,9 @@ pipeline {
           dir ('./holdings-api') {
             container('maven') {
               sh '''
-              yum install -y jq
-              previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewUrl}/login
+                yum install -y jq
+                previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
+                mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewURL}/login
               '''
             }
           }
@@ -58,16 +58,14 @@ pipeline {
         }
         steps {
           container('nodejs') {
-            dir ('./holdings-api') {
-              sh "chmod +x ./mvnw"
-              sh "./mvnw spring-boot:run --server.port=8000 -Pprod &"
-              sh "sleep 30s"
-            }
-            dir ('./crypto-pwa') {
-              sh "npm install"
-              sh "Xvfb :99 &"
-              sh "DISPLAY=:99 PORT=8000 npm run e2e"
-            }
+            sh '''
+              yum install -y jq
+              previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
+              cd crypto-pwa && npm install --unsafe-perm && npm run e2e-update
+              Xvfb :99 &
+              echo 'Running e2e tests on ${previewURL}...'
+              DISPLAY=:99 npm run e2e-test -- --baseUrl=${previewURL}
+            '''
           }
         }
       }
