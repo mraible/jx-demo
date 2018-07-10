@@ -11,8 +11,7 @@ describe('Login', () => {
     browser.waitForAngular();
   });
 
-  it('should show a login button', () => {
-    browser.sleep(5000);
+  xit('should show a login button', () => {
     expect(loginPage.getHeader()).toMatch(/Login/);
     expect(loginPage.loginButton.isPresent());
   });
@@ -22,7 +21,7 @@ describe('Login', () => {
     loginPage.clickLoginButton();
     loginPage.login('admin', 'foo');
     const error = element.all(by.css('.infobox-error')).first();
-    browser.wait(ec.visibilityOf(error), 2000).then(() => {
+    browser.wait(ec.visibilityOf(error), 5000).then(() => {
       expect(error.getText()).toMatch("Sign in failed!");
     });
   });
@@ -44,7 +43,7 @@ describe('Login', () => {
   it('should log out successfully', () => {
     browser.sleep(1000);
     loginPage.logout();
-    browser.wait(ec.urlContains('/#/login'), 2000);
+    browser.wait(ec.urlContains('/#/login'), 5000);
     expect(loginPage.loginButton.isPresent());
   })
 });

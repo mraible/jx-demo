@@ -27,7 +27,6 @@ pipeline {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
               sh "mvn install -Pprod"
-              sh "echo 'okta.client.token='$OKTA_CLIENT_TOKEN > target/application.properties"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
@@ -36,7 +35,7 @@ pipeline {
 
           dir ('./charts/preview') {
             container('maven') {
-              sh "make preview"
+              sh "make $OKTA_CLIENT_TOKEN=\$OKTA_CLIENT_TOKEN preview"
               sh "jx preview --app $APP_NAME --dir ../.."
             }
           }

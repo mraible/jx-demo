@@ -10,6 +10,5 @@ COPY holdings-api/pom.xml holdings-api/target/lib* /opt/lib/
 # but at least this means we don't have to guess the name
 # we could do with a better way to know the name - or to always create an app.jar or something
 COPY holdings-api/target/*.jar /opt/app.jar
-COPY holdings-api/target/application.properties /opt/.
 WORKDIR /opt
 CMD ["java", "-jar", "app.jar"]
