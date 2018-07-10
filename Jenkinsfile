@@ -44,11 +44,10 @@ pipeline {
           dir ('./holdings-api') {
             container('maven') {
               sh '''
-              yum install -y jq
-              previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewURL}/login
+                yum install -y jq
+                previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
+                mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewURL}/login
               '''
-              echo "here it is! ${previewURL}"
             }
           }
         }
@@ -59,12 +58,14 @@ pipeline {
         }
         steps {
           container('nodejs') {
-            sh "echo 'Running e2e tests on ${previewURL}...'"
-            dir ('./crypto-pwa') {
-              sh "npm install"
-              sh "Xvfb :99 &"
-              sh "DISPLAY=:99 npm run e2e -- --baseUrl=${previewURL}"
-            }
+            sh '''
+              yum install -y jq
+              previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
+              cd crypto-pwa && npm install
+              Xvfb :99 &
+              echo 'Running e2e tests on ${previewURL}...
+              DISPLAY=:99 npm run e2e -- --baseUrl=${previewURL}
+            '''
           }
         }
       }
