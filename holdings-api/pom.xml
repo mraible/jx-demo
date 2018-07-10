@@ -25,6 +25,9 @@
         <okta.version>0.5.0</okta.version>
         <frontend-maven-plugin.version>1.6</frontend-maven-plugin.version>
         <node.version>v8.10.0</node.version>
+        <exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
+        <appId>default</appId>
+        <redirectUri>override-me</redirectUri>
     </properties>
 
     <dependencies>
@@ -195,6 +198,26 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-redirect</id>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>com.okta.developer.cli.AppRedirectUriManager</mainClass>
+                    <classpathScope>test</classpathScope>
+                    <arguments>
+                        <argument>appId ${appId} redirectUri ${redirectUri}</argument>
+                    </arguments>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
@@ -290,6 +313,8 @@
         <profile>
             <id>e2e</id>
             <properties>
+                <!-- Hard-code port instead of using build-helper-maven-plugin. -->
+                <!-- This way, you don't need to add a redirectUri to Okta app. -->
                 <http.port>8000</http.port>
             </properties>
             <build>
@@ -326,6 +351,16 @@
                         </configuration>
                         <executions>
                             <execution>
+                                <id>webdriver update</id>
+                                <goals>
+                                    <goal>npm</goal>
+                                </goals>
+                                <phase>pre-integration-test</phase>
+                                <configuration>
+                                    <arguments>run e2e-update</arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
                                 <id>ionic e2e</id>
                                 <goals>
                                     <goal>npm</goal>
@@ -336,7 +371,7 @@
                                         <PORT>${http.port}</PORT>
                                         <CI>true</CI>
                                     </environmentVariables>
-                                    <arguments>run e2e</arguments>
+                                    <arguments>run e2e-test</arguments>
                                 </configuration>
                             </execution>
                         </executions>
