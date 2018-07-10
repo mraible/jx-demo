@@ -51,11 +51,12 @@ public class AppRedirectUriManager implements ApplicationRunner {
         Set<String> updatedRedirectUris = new LinkedHashSet<>(redirectUris);
         if (operation.equalsIgnoreCase("add")) {
             updatedRedirectUris.add(loginRedirectUri);
-            updatedRedirectUris.add(redirectUri);
         } else if (operation.equalsIgnoreCase("remove")) {
             updatedRedirectUris.remove(loginRedirectUri);
-            updatedRedirectUris.remove(redirectUri);
         }
+
+        // todo: update logout redirect URIs with redirectUri (not currently available in Java SDK)
+        // https://github.com/okta/openapi/issues/132
         app.getSettings().getOAuthClient().setRedirectUris(Collections.toList(updatedRedirectUris));
         app.update();
         System.exit(0);
