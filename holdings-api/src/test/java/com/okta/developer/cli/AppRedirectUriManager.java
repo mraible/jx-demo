@@ -40,18 +40,18 @@ public class AppRedirectUriManager implements ApplicationRunner {
         log.info("Adjusting Okta settings: {appId: {}, redirectUri: {}, operation: {}}", appId, redirectUri, operation);
         OpenIdConnectApplication app = (OpenIdConnectApplication) client.getApplication(appId);
 
-        String logoutRedirectUri = redirectUri.substring(0, redirectUri.indexOf("/login"));
+        String loginRedirectUri = redirectUri + "/login";
 
         // update redirect URIs
         List<String> redirectUris = app.getSettings().getOAuthClient().getRedirectUris();
         if (operation.equalsIgnoreCase("add")) {
             if (!redirectUris.contains(redirectUri)) {
                 redirectUris.add(redirectUri);
-                redirectUris.add(logoutRedirectUri);
+                redirectUris.add(loginRedirectUri);
             }
         } else if (operation.equalsIgnoreCase("remove")) {
             redirectUris.remove(redirectUri);
-            redirectUris.remove(logoutRedirectUri);
+            redirectUris.remove(loginRedirectUri);
         }
         app.getSettings().getOAuthClient().setRedirectUris(redirectUris);
         app.update();

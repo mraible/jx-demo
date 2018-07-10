@@ -27,6 +27,7 @@ pipeline {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
               sh "mvn install -Pprod -DskipTests"
+              sh "echo 'okta.client.token='$OKTA_CLIENT_TOKEN > target/application.properties"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
@@ -46,7 +47,7 @@ pipeline {
               sh '''
                 yum install -y jq
                 previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-                mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewURL}/login
+                mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewURL}
               '''
             }
           }
