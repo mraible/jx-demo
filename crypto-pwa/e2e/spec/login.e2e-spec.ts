@@ -12,10 +12,9 @@ describe('Login', () => {
   });
 
   it('should show a login button', () => {
-    browser.wait(ec.visibilityOf(loginPage.loginButton), 10000).then(() => {
-      expect(loginPage.getHeader()).toMatch(/Login/);
-      expect(loginPage.loginButton.isPresent());
-    });
+    browser.sleep(5000);
+    expect(loginPage.getHeader()).toMatch(/Login/);
+    expect(loginPage.loginButton.isPresent());
   });
 
   it('should fail to log in with bad password', () => {
