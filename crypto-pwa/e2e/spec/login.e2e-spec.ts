@@ -12,6 +12,7 @@ describe('Login', () => {
   });
 
   it('should show a login button', () => {
+    browser.sleep(3000);
     expect(loginPage.getHeader()).toMatch(/Login/);
     expect(loginPage.loginButton.isPresent());
   });
