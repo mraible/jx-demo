@@ -26,7 +26,7 @@ pipeline {
           container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              sh "mvn install -Pprod -DskipTests"
+              sh "mvn install -Pprod"
               sh "echo 'okta.client.token='$OKTA_CLIENT_TOKEN > target/application.properties"
             }
 
@@ -47,7 +47,7 @@ pipeline {
               sh '''
                 yum install -y jq
                 previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-                mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewURL}
+                mvn exec:java@add-redirect -DappId=${OKTA_APP_ID} -DredirectUri=${previewURL}
               '''
             }
           }
@@ -64,7 +64,8 @@ pipeline {
               previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
               cd crypto-pwa && npm install --unsafe-perm && npm run e2e-update
               Xvfb :99 &
-              echo 'Running e2e tests on ${previewURL}...'
+              echo 'Running e2e tests on ${previewURL} in 60s...'
+              sleep 60s
               DISPLAY=:99 npm run e2e-test -- --baseUrl=${previewURL}
             '''
           }
