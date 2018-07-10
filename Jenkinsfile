@@ -26,7 +26,7 @@ pipeline {
           container('maven') {
             dir ('./holdings-api') {
               sh "mvn versions:set -DnewVersion=$PREVIEW_VERSION"
-              sh "mvn install -Pprod"
+              sh "mvn install -Pprod -DskipTests"
             }
 
             sh 'export VERSION=$PREVIEW_VERSION && skaffold build -f skaffold.yaml'
@@ -46,7 +46,7 @@ pipeline {
               sh '''
               yum install -y jq
               previewUrl=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
-              echo \$(previewUrl) > ../PREVIEW_URL
+              echo $previewUrl > ../PREVIEW_URL
               mvn exec:java@add-redirect -DappId=$OKTA_APP_ID -DredirectUri=${previewUrl}/login
               '''
             }
@@ -60,7 +60,7 @@ pipeline {
         steps {
           container('nodejs') {
             sh "previewUrl=\$(cat PREVIEW_URL)"
-            sh "echo 'Running e2e tests on ${previewURL}...'"
+            sh "echo 'Running e2e tests on ${previewUrl}...'"
             dir ('./crypto-pwa') {
               sh "npm install"
               sh "Xvfb :99 &"
