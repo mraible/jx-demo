@@ -64,7 +64,7 @@ pipeline {
               previewURL=$(jx get preview -o json|jq  -r ".items[].spec | select (.previewGitInfo.name==\\"$CHANGE_ID\\") | .previewGitInfo.applicationURL")
               cd crypto-pwa && npm install --unsafe-perm && npm run e2e-update
               Xvfb :99 &
-              echo 'Running e2e tests on $previewURL in 60s...'
+              echo 'Running e2e tests on \$previewURL in 60s...'
               sleep 60s
               DISPLAY=:99 npm run e2e-test -- --baseUrl=$previewURL
             '''

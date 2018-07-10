@@ -50,11 +50,11 @@ public class AppRedirectUriManager implements ApplicationRunner {
         // use a set so values are unique
         Set<String> updatedRedirectUris = new LinkedHashSet<>(redirectUris);
         if (operation.equalsIgnoreCase("add")) {
-            updatedRedirectUris.add(redirectUri);
             updatedRedirectUris.add(loginRedirectUri);
+            updatedRedirectUris.add(redirectUri);
         } else if (operation.equalsIgnoreCase("remove")) {
-            updatedRedirectUris.remove(redirectUri);
             updatedRedirectUris.remove(loginRedirectUri);
+            updatedRedirectUris.remove(redirectUri);
         }
         app.getSettings().getOAuthClient().setRedirectUris(Collections.toList(updatedRedirectUris));
         app.update();

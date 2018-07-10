@@ -12,7 +12,7 @@ describe('Login', () => {
   });
 
   it('should show a login button', () => {
-    browser.wait(ec.visibilityOf(loginPage.header), 5000).then(() => {
+    browser.wait(ec.visibilityOf(loginPage.header), 30000).then(() => {
       expect(loginPage.getHeader()).toMatch(/Login/);
       expect(loginPage.loginButton.isPresent());
     });
